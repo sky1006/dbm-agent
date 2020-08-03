@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
 import os
 import configparser
 from . import checkings
@@ -39,8 +42,7 @@ class DbmCnf(object):
 
             self.host_uuid = parser['dbma'].get(
                 'host_uuid', 'dde1f082-67fc-436f-a149-90a1fa4612c2')
-            self.dbmc_site = parser['dbma'].get(
-                'dbmc_site', 'http://172.16.192.1:8080')
+            self.dbmc_site = parser['dbma']['dbmc_site']    # .get('dbmc_site', 'http://172.16.192.1:8080')
             self.base_dir = parser['dbma'].get(
                 'base_dir', '/usr/local/dbm-agent/')
             self.config_file = parser['dbma'].get(
@@ -51,8 +53,8 @@ class DbmCnf(object):
             self.pid = parser['dbma']['pid']
             self.init_pwd = parser['dbma']['init_pwd']
             self.net_if = parser['dbma']['net_if']
-            self.mysql_install_dir = parser['dbma'].get(
-                'mysql_install_dir', '/usr/local/')
+            self.mysql_install_dir = parser['dbma']['mysql_install_dir']
+            # .get('mysql_install_dir', '/usr/local/')
 
         # API 固定以减小配置文件中的选项数量
         self.api_host = "dbmc/hosts/"

@@ -697,11 +697,11 @@ class MySQLInstallerMixin(object):
         """
         在执行完成成检查之后，就可以保存实例的各个属性是正确的，于是就可以根据这些属性来生成依赖属性了
         """
-        self.basedir = f"/usr/local/{self._get_mysql_version()}"
-        self.datadir = f"/database/mysql/data/{self.port}"
-        self.binlogdir = f"/binlog/mysql/binlog/{self.port}"
-        self.backupdir = f"/backup/mysql/backup/{self.port}"
-        self.user = f"mysql{self.port}"
+        self.basedir = f"{self.dbma.mysql_install_dir}/{self._get_mysql_version()}"
+        self.datadir = f"{self.data_dir}/data{self.port}"
+        self.binlogdir = f"{self.data_dir}/binlog{self.port}"
+        self.backupdir = f"{self.data_dir}/backup{self.port}"
+        self.user = f"{self.user}"
 
     def _basic_checks(self):
         """
@@ -1008,7 +1008,7 @@ class MySQLInstallerMixin(object):
 
         with common.sudo("init database"):
             args = [f'{self.basedir}/bin/mysqld', f'--defaults-file=/tmp/mysql-init.cnf',
-                    '--initialize-insecure', f'--user=mysql{self.port}', f'--init-file={init_file}']
+                    '--initialize-insecure', f'--user={self.user}', f'--init-file={init_file}']
             logger.info(args)
             subprocess.run(args, stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE)
@@ -1420,7 +1420,7 @@ class MySQLInstaller(threading.Thread, MySQLInstallerMixin):
     logger = logger.getChild('SingleInstanceInstaller')
 
     def __init__(self, pkg="mysql-8.0.18-linux-glibc2.12-x86_64.tar.xz",
-                 port=3306, max_mem=128, cores=1, name='im', daemon=True):
+                 port=3306, max_mem=128, cores=1, name='im', user='mysql', datadir='', daemon=True):
         """
 
         """
@@ -1436,6 +1436,8 @@ class MySQLInstaller(threading.Thread, MySQLInstallerMixin):
         self.port = port
         self.max_mem = max_mem
         self.cores = cores
+        self.user = user
+        self.data_dir = datadir
 
         self.is_successful_complete = False
 
@@ -1463,18 +1465,18 @@ class MySQLUninstaller(threading.Thread, MySQLUninstallerMixin):
     """
     logger = logger.getChild('MysqlUninstaller')
 
-    def __init__(self, port=3306):
+    def __init__(self, port=3306, user='mysql', datadir=''):
         """
         """
         logger = self.logger.getChild('MysqlUninstaller')
 
         threading.Thread.__init__(self, name='um', daemon=True)
         self.port = port
-        self.user = f"mysql{self.port}"
-        self.datadir = f"/database/mysql/data/{self.port}"
+        self.user = user
+        self.datadir = f"{datadir}/data{self.port}"
         self.cnf_file = f"/etc/my-{self.port}.cnf"
-        self.binlogdir = f"/binlog/mysql/binlog/{self.port}"
-        self.backupdir = f"/backup/mysql/backup/{self.port}"
+        self.binlogdir = f"{datadir}/binlog{self.port}"
+        self.backupdir = f"{datadir}/backup{self.port}"
         self.systemd_file = f"/usr/lib/systemd/system/mysqld-{self.port}.service"
 
     def after_complete(self):

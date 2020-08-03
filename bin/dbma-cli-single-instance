@@ -54,12 +54,14 @@ def main():
     port = args.port
     action = args.action
     cores = args.cores
+    datadir = args.datadir
+    user = args.user
 
     if action == 'install':
 
         # 数据库安装
         installer = MySQLInstaller(
-            pkg=pkg, max_mem=max_mem, port=port, cores=cores)
+            pkg=pkg, max_mem=max_mem, port=port, cores=cores, datadir=datadir,user=user)
         installer.start()
 
         # 主线程等待安装完成
@@ -67,7 +69,7 @@ def main():
     elif action == 'uninstall':
         logger.info(f"start uninstall mysqld-{args.port}")
         # 数据库卸载
-        uninstaller = MySQLUninstaller(port=args.port)
+        uninstaller = MySQLUninstaller(port=port, datadir=datadir, user=user)
         uninstaller.start()
 
         # 主线程等待卸载完成
