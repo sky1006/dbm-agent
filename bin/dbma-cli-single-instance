@@ -29,6 +29,7 @@ def parser_cmd_args():
     parser.add_argument('--log', type=str, default='info',
                         choices=['debug', 'info', 'warning', 'error'])
     parser.add_argument('action', type=str, choices=['install', 'uninstall'])
+    parser.add_argument('--datadir', type=str, default='/home/mysql', help='mysql data directory')
     args = parser.parse_args()
     return args
 
